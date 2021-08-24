@@ -1,0 +1,38 @@
+---
+title: "Lesbrief: Waarom duurt saai zo lang?"
+author: "Scholierenacademie"
+output: html_document
+params:
+  sec:
+    value: x
+  risk:
+    value: x
+  context:
+    value: x
+---
+
+# 1-seconde-taak
+
+Hieronder zie je de resultaten van het eerste experiment, de 1-seconde taak. In de 1-seconde taak moest je zo precies mogelijk een seconde inschatten. Elk punt in de grafiek staat voor een tijdswaarneming. De horizontale, zwarte lijnen zijn de gemiddelde scores in elke groep. De vragen in het lespakket helpen je de resultaten van deze grafiek te interpreteren.
+
+```{r, echo = F, warning = F}
+params$sec
+```
+
+# Risico-taak
+
+Hieronder vind je de resultaten van het tweede experiment: de risico-taak. In de risico-taak moest je ook tijdsinschatting maken, maar nu kon je strafpunten krijgen als je te vroeg was. De verschillende kleuren geven de verschillende risico-groepen aan. De stippen zijn de individuele tijdswaarnemingen en de horizontale zwarte strepen zijn weer de gemiddelde scores in de groep. 
+
+```{r, echo = F, warning = F}
+params$risk
+```
+
+# Context-taak
+
+Hieronder staan de resultaten voor de laatste taak: de context-taak. In deze context-taak moest je onder verschilden omstandigheden (veel lange tijdsinschattingen, of veel korte tijdsinschattingen) tijdsinschattingen maken. Ook hier zijn de stippen de individuele tijdswaarnemingen en de horizontale zwarte lijnen de gemiddeldes.
+
+```{r, echo = F, warning = F}
+params$context
+```
+
+
