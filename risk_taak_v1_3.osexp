@@ -1,0 +1,276 @@
+---
+API: 2.1
+OpenSesame: 3.3.3
+Platform: posix
+---
+set width 1024
+set uniform_coordinates yes
+set title TUR
+set subject_parity even
+set subject_nr 0
+set start experiment
+set sound_sample_size -16
+set sound_freq 48000
+set sound_channels 2
+set sound_buf_size 1024
+set sampler_backend legacy
+set round_decimals 2
+set mouse_backend legacy
+set keyboard_backend legacy
+set height 768
+set fullscreen no
+set form_clicks no
+set foreground black
+set font_underline no
+set font_size 18
+set font_italic no
+set font_family serif
+set font_bold no
+set experiment_path "/Volumes/GoogleDrive/My Drive/scholieren_academie/risk"
+set disable_garbage_collection yes
+set description "The main experiment item"
+set coordinates uniform
+set compensation 0
+set color_backend legacy
+set clock_backend legacy
+set canvas_backend legacy
+set background white
+
+define advanced_delay ITI
+	set jitter_mode Uniform
+	set jitter 1000
+	set duration 1000
+	set description "Waits for a specified duration"
+
+define sketchpad block_begin
+	set duration 0
+	set description "Displays stimuli"
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=24 html=yes show_if="[punish] = 0" text="Vanaf nu krijg je punten als je op tijd bent, <br />probeer er zoveel mogelijk te verzamelen!<br /><br />Druk op de ENTER om door te gaan" x=0 y=0 z_index=0
+	draw textline center=1 color=red font_bold=no font_family=serif font_italic=no font_size=24 html=yes show_if="[punish] != 0" text="Let op! Vanaf nu krijg je [punish] strafpunten als je toe vroeg bent! <br />Pas dus goed op!<br /><br />Druk op de ENTER om door te gaan" x=0 y=0 z_index=0
+
+define loop block_loop
+	set source_file ""
+	set source table
+	set repeat 1
+	set order sequential
+	set description "Repeatedly runs another item"
+	set cycles 4
+	set continuous no
+	set break_if_on_first no
+	set break_if never
+	setcycle 0 practice yes
+	setcycle 0 block_repeat 10
+	setcycle 0 punish 0
+	setcycle 1 practice no
+	setcycle 1 block_repeat 20
+	setcycle 1 punish 0
+	setcycle 2 practice no
+	setcycle 2 block_repeat 20
+	setcycle 2 punish 5
+	setcycle 3 practice no
+	setcycle 3 block_repeat 20
+	setcycle 3 punish 30
+	run block_procedure
+
+define sequence block_procedure
+	set flush_keyboard yes
+	set description "Runs a number of items in sequence"
+	run practice_begin "[practice] = yes"
+	run continue "[practice] = yes"
+	run practice_loop "[practice] = yes"
+	run practice_end "[practice] = yes"
+	run continue "[practice] = yes"
+	run block_begin "[practice] = no"
+	run continue "[practice] = no"
+	run trial_loop "[practice] = no"
+
+define keyboard_response continue
+	set timeout infinite
+	set flush yes
+	set event_type keypress
+	set duration keypress
+	set description "Collects keyboard responses"
+	set correct_response ENTER
+	set allowed_responses ENTER
+
+define sketchpad end_of_experiment
+	set duration keypress
+	set description "Displays stimuli"
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=28 html=yes show_if=always text="Klaar! Druk op ENTER om weer <br />naar het menu terug te gaan." x=0 y=0 z_index=0
+
+define sequence experiment
+	set flush_keyboard yes
+	set description "Runs a number of items in sequence"
+	run instructie always
+	run continue always
+	run task_loop always
+	run end_of_experiment always
+	run continue always
+
+define feedback feedback
+	set reset_variables yes
+	set duration 1500
+	set description "Provides feedback to the participant"
+	draw rect color="#c9cbcb" fill=1 h=32 penwidth=1 show_if=always w=450 x=-225 y=-160 z_index=1
+	draw circle color=red fill=1 penwidth=0 r=50 show_if="[punish] > 0 and [trial_resp] = early" x=0 y=0 z_index=0
+	draw circle color=gray fill=1 penwidth=0 r=50 show_if="[punish] = 0 and [trial_resp] = early" x=0 y=0 z_index=0
+	draw circle color=green fill=1 penwidth=0 r=50 show_if="[trial_resp] = correct" x=0 y=0 z_index=0
+	draw circle color=gray fill=1 penwidth=0 r=50 show_if="[punish] = 0 and [trial_resp] = late" x=0 y=0 z_index=0
+	draw circle color=gray fill=1 penwidth=0 r=50 show_if="[trial_resp] = late" x=0 y=0 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[practice] = yes" text="Oefenronde <br><br> Druk precies 1 seconde nadat de circel geel wordt." x=0 y=100 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[practice] = no and [punish] = 0" text="Puntenronde 1" x=0 y=100 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[punish] = 5" text="Puntenronde 2 <br><br>Let op! 5 strafpunten als je te vroeg bent!" x=0 y=100 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[punish] = 30" text="Puntenronde 3 <br><br>Let op! 30 strafpunten als je te vroeg bent!" x=0 y=100 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[practice] = no" text="[total_points]" x=0 y=-75 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[practice] = no and [cur_points] = 0" text="+ 0" x=50 y=-100 z_index=0
+	draw textline center=1 color=red font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[practice] = no and [cur_points] < 0" text="[cur_points]" x=50 y=-100 z_index=0
+	draw textline center=1 color=green font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[practice] = no and [cur_points] > 0" text="+ 5" x=50 y=-100 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[trial_resp] = early" text="Te vroeg!" x=0 y=0 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[trial_resp] = late" text="Te laat!" x=0 y=0 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[trial_resp] = correct" text="Goedzo!" x=0 y=0 z_index=0
+	draw rect color="#108001" fill=1 h=32 penwidth=1 show_if=always w="[progbar]" x=-225 y=-160 z_index=0
+	draw rect color=black fill=0 h=32 penwidth=3 show_if=always w=450 x=-225 y=-160 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if=always text="[progperc]%" x=-260 y=-146 z_index=0
+
+define sketchpad instructie
+	set duration 0
+	set description "Displays stimuli"
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if=always text="Probeer zoveel mogelijk punten te verzamelen door <br/>telkens precies op tijd op de <u><span style='font-size:30px;'>SPATIEBALK</span></u> te drukken. <br /><br />Druk precies 1 seconde nadat de <u><span style='font-size:30px;'>cirkel geel</span></u> wordt <br />om 5 punten te verdienen.<br /><br />Druk op de <u><span style='font-size:30px;'>ENTER</span></u> om een paar keer te oefenen." x=0 y=0 z_index=0
+
+define sketchpad inter_trial
+	set duration 0
+	set description "Displays stimuli"
+	draw rect color="#c9cbcb" fill=1 h=32 penwidth=1 show_if=always w=450 x=-225 y=-160 z_index=1
+	draw circle color=gray fill=1 penwidth=0 r=50 show_if=always x=0 y=0 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[practice] = yes" text="Oefenronde <br><br> Druk precies 1 seconde nadat de circel geel wordt." x=0 y=100 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[practice] = no and [punish] = 0" text="Puntenronde 1" x=0 y=100 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[punish] = 5" text="Puntenronde 2 <br><br>Let op! 5 strafpunten als je te vroeg bent!" x=0 y=100 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[punish] = 30" text="Puntenronde 3 <br><br>Let op! 30 strafpunten als je te vroeg bent!" x=0 y=100 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[practice] = no" text="[total_points]" x=0 y=-75 z_index=0
+	draw rect color="#108001" fill=1 h=32 penwidth=1 show_if=always w="[progbar]" x=-225 y=-160 z_index=0
+	draw rect color=black fill=0 h=32 penwidth=3 show_if=always w=450 x=-225 y=-160 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if=always text="[progperc]%" x=-260 y=-146 z_index=0
+
+define logger logger
+	set description "Logs experimental data"
+	set auto_log yes
+
+define inline_javascript points
+	set description "Executes JavaScript code (ECMA 5.1)"
+	___run__
+	if(vars.response_time_reproduction < vars.rt_early){
+		vars.trial_resp = 'early'
+		vars.cur_points = -vars.punish
+	} else if(vars.response_time_reproduction > vars.rt_late){
+		vars.trial_resp = 'late'
+		vars.cur_points = 0
+	} else {
+		vars.trial_resp = 'correct'
+		vars.cur_points = 5
+	}
+	
+	if(vars.practice == 'no'){
+		vars.total_points = vars.total_points + vars.cur_points
+	}
+	
+	vars.progbar = 450/vars.total_trials * (vars.count_trial_procedure + 1)
+	vars.progperc = Math.round((vars.count_trial_procedure+1) / vars.total_trials * 100)
+	__end__
+	set _prepare ""
+
+define sketchpad practice_begin
+	set duration 0
+	set description "Displays stimuli"
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if=always text="Ben je er klaar voor?<br /><br />Druk op de ENTER om door te gaan" x=0 y=0 z_index=0
+
+define sketchpad practice_end
+	set duration 0
+	set description "Displays stimuli"
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=24 html=yes show_if=always text="Genoeg geoefend, we gaan beginnen!<br /><br />Druk op de ENTER om door te gaan" x=0 y=0 z_index=0
+
+define loop practice_loop
+	set source_file ""
+	set source table
+	set repeat "[block_repeat]"
+	set order random
+	set description "Repeatedly runs another item"
+	set cycles 1
+	set continuous no
+	set break_if_on_first no
+	set break_if never
+	setcycle 0 empty_column ""
+	run trial_procedure
+
+define keyboard_response reproduction
+	set timeout infinite
+	set flush yes
+	set event_type keypress
+	set duration keypress
+	set description "Collects keyboard responses"
+	set correct_response SPACE
+	set allowed_responses SPACE
+
+define sketchpad stimulus
+	set duration 0
+	set description "Displays stimuli"
+	draw rect color="#c9cbcb" fill=1 h=32 penwidth=1 show_if=always w=450 x=-225 y=-160 z_index=1
+	draw circle color=yellow fill=1 penwidth=0 r=50 show_if=always x=0 y=0 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[practice] = yes" text="Oefenronde <br><br> Druk precies 1 seconde nadat de circel geel wordt." x=0 y=100 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[practice] = no and [punish] = 0" text="Puntenronde 1" x=0 y=100 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[punish] = 5" text="Puntenronde 2 <br><br>Let op! 5 strafpunten als je te vroeg bent!" x=0 y=100 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[punish] = 30" text="Puntenronde 3 <br><br>Let op! 30 strafpunten als je te vroeg bent!" x=0 y=100 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if="[practice] = no" text="[total_points]" x=0 y=-75 z_index=0
+	draw rect color="#108001" fill=1 h=32 penwidth=1 show_if=always w="[progbar]" x=-225 y=-160 z_index=0
+	draw rect color=black fill=0 h=32 penwidth=3 show_if=always w=450 x=-225 y=-160 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=serif font_italic=no font_size=18 html=yes show_if=always text="[progperc]%" x=-260 y=-146 z_index=0
+
+define loop task_loop
+	set source_file ""
+	set source table
+	set repeat 1
+	set order random
+	set description "Repeatedly runs another item"
+	set cycles 1
+	set continuous no
+	set break_if_on_first no
+	set break_if never
+	setcycle 0 rt 0
+	setcycle 0 cur_points 0
+	setcycle 0 feedback_text ""
+	setcycle 0 total_points 0
+	setcycle 0 rt_early 850
+	setcycle 0 rt_late 1150
+	setcycle 0 progbar 0
+	setcycle 0 total_trials 70
+	setcycle 0 progperc 0
+	run task_procedure
+
+define sequence task_procedure
+	set flush_keyboard yes
+	set description "Runs a number of items in sequence"
+	run block_loop always
+
+define loop trial_loop
+	set source_file ""
+	set source table
+	set repeat "[block_repeat]"
+	set order random
+	set description "Repeatedly runs another item"
+	set cycles 1
+	set continuous no
+	set break_if_on_first no
+	set break_if never
+	setcycle 0 empty_column ""
+	run trial_procedure
+
+define sequence trial_procedure
+	set flush_keyboard yes
+	set description "Runs a number of items in sequence"
+	run inter_trial always
+	run ITI always
+	run stimulus always
+	run reproduction always
+	run points always
+	run feedback always
+	run logger always
+
